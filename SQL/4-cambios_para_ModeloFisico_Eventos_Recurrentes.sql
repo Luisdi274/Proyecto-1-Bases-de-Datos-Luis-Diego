@@ -7,7 +7,7 @@ create table SERIES_EVENTOS (
 
     fecha_inicio date not null,
     fecha_fin date not null,
-    clase_periodicidad varchar(15) not null,
+    clase_periodicidad varchar(21) not null,
     --debe ser diaria,semanal, mensual o personalizada, pero nunca nula, luego se le agregará un check
     intervalo_en_dias_eventos int,
     --este es el campo que se debe llenar en caso de que sea personalizado, de lo contrario es nulo, pues se sobre entiende
