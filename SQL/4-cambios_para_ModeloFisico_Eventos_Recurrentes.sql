@@ -1,6 +1,6 @@
 create table SERIES_EVENTOS (
     id_serie SERIAL primary key,
-    id_usuario_propietario int not null REFERENCES usuarios(id_usuario)
+    id_usuario_propietario int not null REFERENCES usuarios(id_usuario),
     --esta es la llave foranea de esta tabla
     titulo_serie varchar(90) not null,
     --lo que aparece en pantalla de la aplicacion no puede ser nulo, es un titulo especifico para la serie del evento
