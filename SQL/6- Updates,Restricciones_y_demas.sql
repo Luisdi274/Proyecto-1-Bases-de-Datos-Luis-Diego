@@ -45,5 +45,7 @@ estado in('pendiente','en progreso','completada','cancelada')
 );
 --igual que en el primer constraint, el modulo de tareas para esta tabla solo permite 4 posibles valores para su columna estado
 
+alter table ubicaciones add constraint dominio_capacidad check(capacidad >0);
+--revision de dominio
 
 
