@@ -40,5 +40,10 @@ values (1,'Clase de yoga','2026-09-17','2026-12-17','semanal',null,null);
 
 
 
+alter table tareas add constraint fijacion_entradas_estado_tareas check(
+estado in('pendiente','en progreso','completada','cancelada')
+);
+--igual que en el primer constraint, el modulo de tareas para esta tabla solo permite 4 posibles valores para su columna estado
+
 
 
