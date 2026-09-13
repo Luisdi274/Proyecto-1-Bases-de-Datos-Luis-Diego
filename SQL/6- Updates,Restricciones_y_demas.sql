@@ -24,4 +24,8 @@ alter table series_eventos add constraint valores_para_dias_especificos_serie_ev
 );
 
 
+insert into usuarios(nombre,apellido)
+values ('Ana','Rodriguez')
 
+
+select *from usuarios 
