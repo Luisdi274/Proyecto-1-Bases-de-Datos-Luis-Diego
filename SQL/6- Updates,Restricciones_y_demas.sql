@@ -29,3 +29,16 @@ values ('Ana','Rodriguez')
 
 
 select *from usuarios 
+
+insert into series_eventos (id_usuario_propietario,titulo_serie,fecha_inicio,fecha_fin,clase_periodicidad,intervalo_en_dias_eventos,reserva_dias_especificos)
+values (1,'Clase de yoga','2026-09-17','2026-12-17','semanal',null,'martes,jueves');
+--prueba usando un caso válido de los constraints check
+
+
+insert into series_eventos (id_usuario_propietario,titulo_serie,fecha_inicio,fecha_fin,clase_periodicidad,intervalo_en_dias_eventos,reserva_dias_especificos)
+values (1,'Clase de yoga','2026-09-17','2026-12-17','semanal',null,null);
+
+
+
+
+
