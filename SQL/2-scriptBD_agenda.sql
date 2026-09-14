@@ -101,12 +101,24 @@ BEGIN
     END IF;
 
 	WITH RECURSIVE tiene_ancestros AS (
+--ancestros funciona como cuando en estructuras de datos usas una variable temporal para guardar info, aqui es una tabla para corroborar si hay ciclos o no
 		SELECT id_categoria,id_categoria_padre
 		FROM CATEGORIAS
 		WHERE id_categoria = NEW.id_categoria_padre
 --esto recorre todo el árbol para ver la cadena de padres y ver si hay algun ciclo, osea que una categoria sea su propio padre
 --funciona con una lista, se recorre el padre que se quiera registrar y va buscando y repitiendo recursivamente hasta que se genera un conjunto
 --si en ese conjunto uno de sus elementos es el propio padre que se quiere registrar, se rechaza la operación
+		UNION ALL
+		
+		SELECT pCategoria.id_categoria,pCategoria.id_categoria_padre
+		FROM categorias pCategoria
+
+		INNER JOIN tiene_ancestros pAncestro on pCategoria.id_categoria = pAncestro.id_categoria_padre
+--aqui lo que buscamos es agarrar coincidencias de datos entre los ancestros , compara el id_categoria de la tabla de categorias 
+--Recordemos que tanto id_categoria como id_categoria_padre estan en la misma tabla, simplemente que en el inner join lo que se hará es que una categoria pCategoria
+--con cierto id_categoria_padre busca la fila q tenga ese mismo id, y así repetitivamente hasta que id_categoria_padre sea nulo
+		
+		
 
 
     -- Aquí se podría añadir una consulta recursiva para validar ancestros, 
