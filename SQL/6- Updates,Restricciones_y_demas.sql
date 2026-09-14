@@ -71,12 +71,17 @@ create view carga_trabajo_usuarios as
 select usu.id_usuario,us.nombre,us.apellido,
 count(*) filter (where pTarea.estado in('pendiente','en progreso'))
 --aqui va a contar las instancias o tuplas pero solo las que cumplen la condicion del where
-
 count(*) filter(
 where pTarea.estado not in ('completada', 'cancelada') and pTarea.fecha_limite< current_date
 )as tareas_Vencidas
 --current date es palabra reservada de sql para la fecha actual
 from usuarios as usu
+left join tareas pTarea on pTarea.id_usuario_a_cargo=usu.id_usuario
+--recordar que este join basicamente hace que se presenten las filas o registros de la tabla de ubicaciones, tenga relacion o no con la tabla derecha
+--y si no lo hay, pone null en la segunda tabla
+group by usu.id_usuario,usu.nombre,usu.apellido
+order by tareas_Vencidas desc, tareas_activas desc;
+
 
 
 
