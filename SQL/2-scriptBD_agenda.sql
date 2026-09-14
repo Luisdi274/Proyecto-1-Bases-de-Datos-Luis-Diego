@@ -171,15 +171,21 @@ begin
 	if new.id_ubicacion is not null then
 		select exists (
 			select * from eventos pEvento where pEvento.id_ubicacion= new.id_ubicacion
-			and pEvento.id_evento <>new.id_evento and (pEvento.fecha_inicio,pEvento.fecha_fin) overlaps (new.fecha_inicio,new.fecha_fin)) into hay_traslape
+			and pEvento.id_evento <> coalesce(new.id_evento,-1) and (pEvento.fecha_inicio,pEvento.fecha_fin) overlaps (new.fecha_inicio,new.fecha_fin)) into hay_traslape
+			--se pone coalesce, pues por un trigger ya existente, el id_evento es nulo en un insert, por lo que siempre devolverá el -1
 		if hay_traslape then
+		--coalesce devuelve el primer valor no nulo de una lista
 			raise exception 'la ubicación deseada ya está reservada, es decir que choca en algun punto el horario';
+		end if
 --estoy pensando la idea para este select exists, pero puedo usar un ejemplo como eventos pEvento y comparar si su id_ubicacion es el mismo al id_ubicacion del nuevo registro que se quiere hacer
 		
 			--el overlaps es para ver si un evento choca con el nuevo, por eso es una consulta select, y luego select exists para ver si hay true o false
-		
-		
-end
+	end if;
+	
+	return new;
+	
+end;
+$$ language plpgsql;
 
 
 
