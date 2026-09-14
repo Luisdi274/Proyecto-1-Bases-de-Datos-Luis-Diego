@@ -67,7 +67,7 @@ group by ubi.id_ubicacion, ubi.nombre, ubi.ciudad
 order by numero_eventos desc;
 
 
-create view carga_trabajo_usuarios as
+create view usuarios_y_sus_respevctivas_tareas as
 select usu.id_usuario,us.nombre,us.apellido,
 count(*) filter (where pTarea.estado in('pendiente','en progreso'))
 --aqui va a contar las instancias o tuplas pero solo las que cumplen la condicion del where
@@ -81,7 +81,11 @@ left join tareas pTarea on pTarea.id_usuario_a_cargo=usu.id_usuario
 --y si no lo hay, pone null en la segunda tabla
 group by usu.id_usuario,usu.nombre,usu.apellido
 order by tareas_Vencidas desc, tareas_activas desc;
+--presenta las tareas vencidas, pero de cada usuario, no como tal esas tareas
 
+create view  vista_tareas_vencidas_en_evento as 
+select distinct pEvento.id_evento,pEvento.titulo,pEvento.fecha_inicio,pEvento.fecha_fin
+--el distinct es para que no se repitan resultados iguales, en este caso para un mismo evento
 
 
 
