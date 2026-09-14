@@ -117,6 +117,20 @@ BEGIN
 --aqui lo que buscamos es agarrar coincidencias de datos entre los ancestros , compara el id_categoria de la tabla de categorias 
 --Recordemos que tanto id_categoria como id_categoria_padre estan en la misma tabla, simplemente que en el inner join lo que se hará es que una categoria pCategoria
 --con cierto id_categoria_padre busca la fila q tenga ese mismo id, y así repetitivamente hasta que id_categoria_padre sea nulo
+--es una busqueda de padres hasta que no haya
+		
+		SELECT EXISTS (
+--exists va a convertir esta consulta en un valor booleano (TRUE/FALSE)
+			SELECT * FROM tiene_ancestros WHERE id_categoria = NEW.id_categoria
+			--esto quiere decir que va a preguntar si en esa tabla de tiene_ancestros hay una instancia que su id sea igual al id de la categoria a registrar(el "elemento" nuevo)
+			--en caso afirmativo(TRUE) implica que hay un caso donde alguien es su propio ancestro o se registra un caso donde un elemento menor quiere ser ancestro de otro (y no es lógico)
+			--osea que hay ciclo
+		) INTO existencia_ciclo;
+
+		IF existencia_ciclo THEN
+			RAISE EXCEPTION 'Imposible guardar esta categoria como padre, provocaría cico jerarquico'
+			
+		
 		
 		
 
