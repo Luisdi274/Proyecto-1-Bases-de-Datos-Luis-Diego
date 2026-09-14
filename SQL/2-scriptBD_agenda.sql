@@ -153,7 +153,7 @@ declare
 begin
 		select activo into usuario_activo from usuarios where id_usuario = new.id_usuario_propietario
 		--esto se pone porque un usuario que sea propietario de un evento solo puede tener estado activo
-		if usuario activo is false then 
+		if usuario_activo is false then 
 			raise exception 'no se puede crear o cambiar un evento si el usuario no está activo';
 		end if;
 		return new;
@@ -167,7 +167,7 @@ CREATE TRIGGER trg_evitar_ciclo
 BEFORE INSERT OR UPDATE ON categorias
 FOR EACH ROW EXECUTE FUNCTION evitar_ciclo_categorias();
 
-create trigger trg_analisis_estado_usuario()
-BEFOR insert or update on eventos
-for each row execute function comprobacion_actividad_usuario()
+create trigger trg_analisis_estado_usuario
+before insert or update on eventos
+for each row execute function comprobacion_actividad_usuario();
 
