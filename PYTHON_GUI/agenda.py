@@ -182,6 +182,7 @@ class AppAgenda(ctk.CTk):
         self.tab_eventos = self.tabview.add("Eventos")
         self.tab_gestUbicaciones=self.tabview.add("Ubicaciones")
         self.tab_eventos_Recurrentes=self.tabview.add("Recurrentes")
+        self.tab_tareas=self.tabview.add("Tareas de eventos")
 
         self.configurar_pestana_usuarios()
         self.configurar_pestana_categorias()
