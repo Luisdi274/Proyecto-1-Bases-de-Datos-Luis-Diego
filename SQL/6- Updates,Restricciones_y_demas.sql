@@ -68,8 +68,8 @@ order by numero_eventos desc;
 
 
 create view usuarios_y_sus_respevctivas_tareas as
-select usu.id_usuario,us.nombre,us.apellido,
-count(*) filter (where pTarea.estado in('pendiente','en progreso'))
+select usu.id_usuario,usu.nombre,usu.apellido,
+count(*) filter (where pTarea.estado in('pendiente','en progreso')) as tareas_actuales,
 --aqui va a contar las instancias o tuplas pero solo las que cumplen la condicion del where
 count(*) filter(
 where pTarea.estado not in ('completada', 'cancelada') and pTarea.fecha_limite<current_date
@@ -80,7 +80,7 @@ left join tareas pTarea on pTarea.id_usuario_a_cargo=usu.id_usuario
 --recordar que este join basicamente hace que se presenten las filas o registros de la tabla de ubicaciones, tenga relacion o no con la tabla derecha
 --y si no lo hay, pone null en la segunda tabla
 group by usu.id_usuario,usu.nombre,usu.apellido
-order by tareas_Vencidas desc, tareas_activas desc;
+order by tareas_Vencidas desc, tareas_actuales desc;
 --presenta las tareas vencidas, pero de cada usuario, no como tal esas tareas
 
 create view  vista_tareas_vencidas_en_evento as 
