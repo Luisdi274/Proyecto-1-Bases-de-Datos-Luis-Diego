@@ -73,7 +73,10 @@ count(*) filter (where pTarea.estado in('pendiente','en progreso'))
 --aqui va a contar las instancias o tuplas pero solo las que cumplen la condicion del where
 
 count(*) filter(
-where pTarea.estado not in ('completada', 'cancelada') 
+where pTarea.estado not in ('completada', 'cancelada') and pTarea.fecha_limite< current_date
+)as tareas_Vencidas
+--current date es palabra reservada de sql para la fecha actual
+
 
 
 
