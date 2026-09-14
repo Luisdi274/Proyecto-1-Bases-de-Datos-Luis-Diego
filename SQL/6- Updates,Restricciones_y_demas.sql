@@ -76,7 +76,7 @@ count(*) filter(
 where pTarea.estado not in ('completada', 'cancelada') and pTarea.fecha_limite< current_date
 )as tareas_Vencidas
 --current date es palabra reservada de sql para la fecha actual
-
+from usuarios as usu
 
 
 
