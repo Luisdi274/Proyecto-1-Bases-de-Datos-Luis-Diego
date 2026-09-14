@@ -186,7 +186,8 @@ class AppAgenda(ctk.CTk):
         self.configurar_pestana_usuarios()
         self.configurar_pestana_categorias()
         self.configurar_pestana_eventos()
-        
+        self.configurar_pestana_ubicaciones()
+        self.configurar_pestana_recurrentes()
         self.seleccionar_modulo("Usuarios")
 
     def al_cambiar_pestana(self):
