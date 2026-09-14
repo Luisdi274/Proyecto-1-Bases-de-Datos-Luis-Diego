@@ -72,7 +72,7 @@ select usu.id_usuario,us.nombre,us.apellido,
 count(*) filter (where pTarea.estado in('pendiente','en progreso'))
 --aqui va a contar las instancias o tuplas pero solo las que cumplen la condicion del where
 count(*) filter(
-where pTarea.estado not in ('completada', 'cancelada') and pTarea.fecha_limite< current_date
+where pTarea.estado not in ('completada', 'cancelada') and pTarea.fecha_limite<current_date
 )as tareas_Vencidas
 --current date es palabra reservada de sql para la fecha actual
 from usuarios as usu
@@ -88,7 +88,11 @@ select distinct pEvento.id_evento,pEvento.titulo,pEvento.fecha_inicio,pEvento.fe
 --el distinct es para que no se repitan resultados iguales, en este caso para un mismo evento
 from eventos pEvento
 join tareas pTarea on pTarea.id_evento = pEvento.id_evento
---este join es el noirmal, pues debe haber coincidencia en las tareas vencidas
+--este join es el normal, pues debe haber coincidencia en las tareas vencidas
+where pTarea.estado not in ('cancelada','completada') and pTarea.fecha_limite <current_date
+order by pEvento.fecha_inicio;
+
+
 
 
 
