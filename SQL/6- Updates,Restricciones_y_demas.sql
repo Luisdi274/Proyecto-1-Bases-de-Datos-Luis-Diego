@@ -55,7 +55,7 @@ select ubi.id_ubicacion, ubi.nombre,ubi.ciudad,
 --esto es para decir las columnas de la tabla que se verán en el reporte. con una "variable" ubi
 count(e.id_evento) as numero_eventos,
 --cuenta cuantos eventos hay
-coalesce(sum(extract(epoch from(e.fecha_fin -e.fecha_inicio))/60),0) as minutos_reservados_totales
+coalesce(sum(extract(epoch from(e.fecha_fin - e.fecha_inicio))/60),0) as minutos_reservados_totales
 --e.fecha_fin -e.fecha_inicio, resta fechas para ver cuanto duró
 --extract(epoch....), es una funcion para convertir a segundos totales, luego se divide entre 60 para tenerlo en minutos
 --sum(....), suma los minutos de los eventos
@@ -65,5 +65,12 @@ left join eventos e on e.id_ubicacion=ubi.id_ubicacion
 --esto es para unir 2 tablas
 group by ubi.id_ubicacion, ubi.nombre, ubi.ciudad
 order by numero_eventos desc;
+
+
+create view carga_trabajo_usuarios as
+select usu.id_usuario,us.nombre,us.apellido,
+count(*) filter (where pTarea.estado in('pendiente','en progreso'))
+
+
 
 
