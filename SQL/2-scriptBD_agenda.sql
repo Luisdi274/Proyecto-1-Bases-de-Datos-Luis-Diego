@@ -129,6 +129,8 @@ BEGIN
 
 		IF existencia_ciclo THEN
 			RAISE EXCEPTION 'Imposible guardar esta categoria como padre, provocaría cico jerarquico'
+		END IF;
+
 			
 		
 		
