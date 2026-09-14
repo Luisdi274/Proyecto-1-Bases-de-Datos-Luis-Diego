@@ -89,6 +89,9 @@ GROUP BY id_usuario_propietario, fecha_inicio::DATE;
 
 CREATE OR REPLACE FUNCTION evitar_ciclo_categorias()
 RETURNS TRIGGER AS $$
+DECLARE
+	existencia_ciclo BOOLEAN;
+--para saber si existe ciclo o no 
 BEGIN
     IF NEW.id_categoria_padre = NEW.id_categoria THEN
         RAISE EXCEPTION 'Una categoría no puede ser padre de sí misma.';
