@@ -150,6 +150,14 @@ returns trigger as $$
 declare
 	usuario_activo BOOLEAN;
 	--en este trigger vamos a declarar una variable booleana para confirmar que usuario está activo
+begin
+		select activo into usuario_activo from usuarios where id_usuario = new.id_usuario_propietario
+		--esto se pone porque un usuario que sea propietario de un evento solo puede tener estado activo
+		if usuario activo is false then 
+			raise exception 'no se puede crear o cambiar un evento si el usuario no está activo';
+		end if;
+end
+
 	
 
 
