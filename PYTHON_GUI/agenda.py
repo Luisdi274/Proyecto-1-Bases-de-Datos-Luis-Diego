@@ -138,6 +138,8 @@ class AppAgenda(ctk.CTk):
             ("Usuarios", "👥"),
             ("Categorías", "📁"),
             ("Eventos", "🗓️"),
+            ("Ubicaciones","🗺️"),
+            ("Recurrentes","🔁"),
         ], start=2):
             btn = ctk.CTkButton(
                 self.sidebar_frame, text=f"{icono}  {nombre}",
@@ -151,10 +153,10 @@ class AppAgenda(ctk.CTk):
             self.sidebar_frame,
             text="🔄  Recargar datos",
             command=self.actualizar_todas_las_tablas
-        ).grid(row=5, column=0, padx=15, pady=(20, 5), sticky="ew")
+        ).grid(row=8, column=0, padx=15, pady=(20, 5), sticky="ew")
 
         ctk.CTkLabel(self.sidebar_frame, text="APARIENCIA", font=ctk.CTkFont(size=11, weight="bold")).grid(
-            row=11, column=0, padx=20, pady=(10, 5), sticky="w"
+            row=14, column=0, padx=20, pady=(10, 5), sticky="w"
         )
         self.option_mode = ctk.CTkOptionMenu(
             self.sidebar_frame,
@@ -178,10 +180,13 @@ class AppAgenda(ctk.CTk):
         self.tab_usuarios = self.tabview.add("Usuarios")
         self.tab_categorias = self.tabview.add("Categorías")
         self.tab_eventos = self.tabview.add("Eventos")
+        self.tab_gestUbicaciones=self.tabview.add("Ubicaciones")
+        self.tab_eventos_Recurrentes=self.tabview.add("Recurrentes")
 
         self.configurar_pestana_usuarios()
         self.configurar_pestana_categorias()
         self.configurar_pestana_eventos()
+        
         self.seleccionar_modulo("Usuarios")
 
     def al_cambiar_pestana(self):
