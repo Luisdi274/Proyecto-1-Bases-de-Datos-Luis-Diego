@@ -70,6 +70,11 @@ order by numero_eventos desc;
 create view carga_trabajo_usuarios as
 select usu.id_usuario,us.nombre,us.apellido,
 count(*) filter (where pTarea.estado in('pendiente','en progreso'))
+--aqui va a contar las instancias o tuplas pero solo las que cumplen la condicion del where
+
+count(*) filter(
+where pTarea.estado not in ('completada', 'cancelada') 
+
 
 
 
