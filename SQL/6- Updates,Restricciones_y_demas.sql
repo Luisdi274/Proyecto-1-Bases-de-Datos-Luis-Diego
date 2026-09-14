@@ -25,8 +25,7 @@ alter table series_eventos add constraint valores_para_dias_especificos_serie_ev
 
 
 insert into usuarios(nombre,apellido)
-values ('Ana','Rodriguez')
-
+values ('Ana','Rodriguez');
 
 select *from usuarios 
 
@@ -37,6 +36,7 @@ values (1,'Clase de yoga','2026-09-17','2026-12-17','semanal',null,'martes,jueve
 
 insert into series_eventos (id_usuario_propietario,titulo_serie,fecha_inicio,fecha_fin,clase_periodicidad,intervalo_en_dias_eventos,reserva_dias_especificos)
 values (1,'Clase de yoga','2026-09-17','2026-12-17','semanal',null,null);
+--este es el caso inválido para comprobar que el check funciona bien
 
 
 
