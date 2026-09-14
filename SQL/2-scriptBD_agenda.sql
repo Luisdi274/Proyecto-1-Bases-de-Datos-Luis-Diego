@@ -162,6 +162,14 @@ $$ language plpgsql;
 
 
 
+create or replace function anti_traslape_eventos()
+returns trigger as $$
+declare 
+	hay_traslape BOOLEAN;
+	-- para confirmar si hay traslape o no en los eventos
+
+
+
 	
 CREATE TRIGGER trg_evitar_ciclo
 BEFORE INSERT OR UPDATE ON categorias
