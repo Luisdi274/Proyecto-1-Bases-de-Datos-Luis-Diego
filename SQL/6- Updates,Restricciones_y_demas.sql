@@ -86,6 +86,10 @@ order by tareas_Vencidas desc, tareas_activas desc;
 create view  vista_tareas_vencidas_en_evento as 
 select distinct pEvento.id_evento,pEvento.titulo,pEvento.fecha_inicio,pEvento.fecha_fin
 --el distinct es para que no se repitan resultados iguales, en este caso para un mismo evento
+from eventos pEvento
+join tareas pTarea on pTarea.id_evento = pEvento.id_evento
+--este join es el noirmal, pues debe haber coincidencia en las tareas vencidas
+
 
 
 
