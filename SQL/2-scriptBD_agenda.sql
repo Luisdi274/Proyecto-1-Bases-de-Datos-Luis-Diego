@@ -99,6 +99,16 @@ BEGIN
     IF NEW.id_categoria_padre = NEW.id_categoria THEN
         RAISE EXCEPTION 'Una categoría no puede ser padre de sí misma.';
     END IF;
+
+	WITH RECURSIVE tiene_ancestros AS (
+		SELECT id_categoria,id_categoria_padre
+		FROM CATEGORIAS
+		WHERE id_categoria = NEW.id_categoria_padre
+--esto recorre todo el árbol para ver la cadena de padres y ver si hay algun ciclo, osea que una categoria sea su propio padre
+--funciona con una lista, se recorre el padre que se quiera registrar y va buscando y repitiendo recursivamente hasta que se genera un conjunto
+--si en ese conjunto uno de sus elementos es el propio padre que se quiere registrar, se rechaza la operación
+
+
     -- Aquí se podría añadir una consulta recursiva para validar ancestros, 
     -- pero para Postgres 14 es altamente eficiente usar el camino (path) o este chequeo simple.
     RETURN NEW;
