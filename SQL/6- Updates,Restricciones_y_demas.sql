@@ -48,4 +48,19 @@ estado in('pendiente','en progreso','completada','cancelada')
 alter table ubicaciones add constraint dominio_capacidad check(capacidad >0);
 --revision de dominio
 
+create view vista_para_ocupacion_ubicacion as
+--una vista de resumen, es como una consulta o un reporte 
+--se genera con los datos que haya en el momento
+select ubi.id_ubicacion, ubi.nombre,ubi.ciudad
+--esto es para decir las columnas de la tabla que se verán en el reporte. con una "variable" ubi
+count(e.id_evento) as numero_eventos,
+--cuenta cuantos eventos hay
+coalesce(sum(extract(epoch from(e.fecha_fin -e.fecha_inicio))/60),0) as minutos_reservados_totales
+--e.fecha_fin -e.fecha_inicio, resta fechas para ver cuanto duró
+--extract(epoch....), es una funcion para convertir a segundos totales, luego se divide entre 60 para tenerlo en minutos
+--sum(....), suma los minutos de los eventos
+--coalesce(....) devuelve 0 si el resultado de todo lo q esta antes de la coma es nulo
+from ubicaciones ubi
+left join eventos e on e.id_ubicacion=u.id_ubicacion
+
 
