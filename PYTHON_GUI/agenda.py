@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
-from datetime import datetime
+from datetime import datetime,timedelta  
 
 import customtkinter as ctk
 import psycopg2
@@ -16,6 +16,13 @@ ctk.set_default_color_theme("blue")
 
 
 class AppAgenda(ctk.CTk):
+
+    dias_en_semana = {"lunes":0,"martes":1,"miercoles":2,"jueves":3,"viernes":4,"sabado":5,"domingo":6}
+    #transformar dias en una manera mas util en numeros
+
+
+
+
     def __init__(self):
         super().__init__()
         self.title("Agenda 3 Patitos")
@@ -33,6 +40,7 @@ class AppAgenda(ctk.CTk):
         self.usuarios_combo = {}
         self.categorias_combo = {}
         self.categorias_padre_combo = {}
+        self.gestionUbicaciones ={}
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
@@ -155,6 +163,8 @@ class AppAgenda(ctk.CTk):
         )
         self.option_mode.set("System")
         self.option_mode.grid(row=12, column=0, padx=15, pady=(0, 25), sticky="ew")
+
+    
 
     def crear_area_principal(self):
         self.main_container = ctk.CTkFrame(self, fg_color="transparent")
