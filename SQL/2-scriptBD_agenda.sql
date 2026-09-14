@@ -167,6 +167,15 @@ returns trigger as $$
 declare 
 	hay_traslape BOOLEAN;
 	-- para confirmar si hay traslape o no en los eventos
+begin
+	if new.id_ubicacion is not null then
+		raise exception 'la ubicación deseada ya está reservada, es decir que choca en algun punto el horario'
+	
+		
+	
+	
+		
+end
 
 
 
