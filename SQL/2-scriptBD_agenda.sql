@@ -114,7 +114,7 @@ BEGIN
 		SELECT pCategoria.id_categoria,pCategoria.id_categoria_padre
 		FROM categorias pCategoria
 
-		INNER JOIN tiene_ancestros pAncestro on pCategoria.id_categoria = pAncestro.id_categoria_padre
+		INNER JOIN tiene_ancestros pAncestro on pCategoria.id_categoria = pAncestro.id_categoria_padre)
 --aqui lo que buscamos es agarrar coincidencias de datos entre los ancestros , compara el id_categoria de la tabla de categorias 
 --Recordemos que tanto id_categoria como id_categoria_padre estan en la misma tabla, simplemente que en el inner join lo que se hará es que una categoria pCategoria
 --con cierto id_categoria_padre busca la fila q tenga ese mismo id, y así repetitivamente hasta que id_categoria_padre sea nulo
@@ -129,7 +129,7 @@ BEGIN
 		) INTO existencia_ciclo;
 
 		IF existencia_ciclo THEN
-			RAISE EXCEPTION 'Imposible guardar esta categoria como padre, provocaría cico jerarquico'
+			RAISE EXCEPTION 'Imposible guardar esta categoria como padre, provocaría cico jerarquico';
 		END IF;
 
 			
@@ -139,10 +139,30 @@ BEGIN
 
 
     -- Aquí se podría añadir una consulta recursiva para validar ancestros, 
-    -- pero para Postgres 14 es altamente eficiente usar el camino (path) o este chequeo simple.
+    -- pero para Postgres 14 es altamente eficiente usar el camino (path) o este chequeo simple. 
+	--aun asi se genera la consulta recursiva
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+create or replace function comprobacion_actividad_usuario()
+returns trigger as $$
+declare
+	usuario_activo BOOLEAN;
+	--en este trigger vamos a declarar una variable booleana para confirmar que usuario está activo
+	
+
+
+
+
+
+
+
+
+
+
+
+
 
 CREATE TRIGGER trg_evitar_ciclo
 BEFORE INSERT OR UPDATE ON categorias
