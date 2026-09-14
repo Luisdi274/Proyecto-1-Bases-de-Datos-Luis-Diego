@@ -198,3 +198,7 @@ create trigger trg_analisis_estado_usuario
 before insert or update on eventos
 for each row execute function comprobacion_actividad_usuario();
 
+create triggger trg_no_traslapes_en_eventos
+before insert or update on eventos
+for each row EXECUT function anti_traslape_eventos();
+
