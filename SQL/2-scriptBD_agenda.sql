@@ -93,6 +93,9 @@ DECLARE
 	existencia_ciclo BOOLEAN;
 --para saber si existe ciclo o no 
 BEGIN
+	IF NEW.id_categoria_padre IS NULL THEN
+		RETURN NEW;
+--se agrega esta parte,pues si la categoria que se quiere registra no tiene un padre, pues se agrega sin problema, pues es la raiz general
     IF NEW.id_categoria_padre = NEW.id_categoria THEN
         RAISE EXCEPTION 'Una categoría no puede ser padre de sí misma.';
     END IF;
