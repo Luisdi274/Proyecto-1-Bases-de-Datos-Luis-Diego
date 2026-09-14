@@ -169,11 +169,12 @@ declare
 	-- para confirmar si hay traslape o no en los eventos
 begin
 	if new.id_ubicacion is not null then
-		raise exception 'la ubicación deseada ya está reservada, es decir que choca en algun punto el horario'
-	
+		raise exception 'la ubicación deseada ya está reservada, es decir que choca en algun punto el horario';
+--estoy pensando la idea para este select exists, pero puedo usar un ejemplo como eventos pEvento y comparar si su id_ubicacion es el mismo al id_ubicacion del nuevo registro que se quiere hacer
+		select exists (
+			select * from eventos pEvento where pEvento.id_ubicacion= new.id_ubicacion)
+			--estoy pensando la idea para este select exists, pero puedo usar 
 		
-	
-	
 		
 end
 
