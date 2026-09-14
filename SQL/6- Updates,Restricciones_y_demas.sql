@@ -51,7 +51,7 @@ alter table ubicaciones add constraint dominio_capacidad check(capacidad >0);
 create view vista_para_ocupacion_ubicacion as
 --una vista de resumen, es como una consulta o un reporte 
 --se genera con los datos que haya en el momento
-select ubi.id_ubicacion, ubi.nombre,ubi.ciudad
+select ubi.id_ubicacion, ubi.nombre,ubi.ciudad,
 --esto es para decir las columnas de la tabla que se verán en el reporte. con una "variable" ubi
 count(e.id_evento) as numero_eventos,
 --cuenta cuantos eventos hay
@@ -61,6 +61,9 @@ coalesce(sum(extract(epoch from(e.fecha_fin -e.fecha_inicio))/60),0) as minutos_
 --sum(....), suma los minutos de los eventos
 --coalesce(....) devuelve 0 si el resultado de todo lo q esta antes de la coma es nulo
 from ubicaciones ubi
-left join eventos e on e.id_ubicacion=u.id_ubicacion
+left join eventos e on e.id_ubicacion=ubi.id_ubicacion
+--esto es para unir 2 tablas
+group by ubi.id_ubicacion, ubi.nombre, ubi.ciudad
+order by numero_eventos desc;
 
 
