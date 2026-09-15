@@ -635,6 +635,24 @@ class AppAgenda(ctk.CTk):
 
 
         ctk.CTkLabel(form,text="Formulario de gestión de ubicaciones",font=ctk.CTkFont(size=16,weight="bold")).pack(pady=(10,15))
+        self.entry_ubicacion_nombre=ctk.CTkEntry(form,placeholder_text="Nombre ej: Sala Principal")
+        self.entry_ubicacion_nombre.pack(fill="x", padx=10, pady=6)
+        self.entry_ubicacion_ciudad = ctk.CTkEntry(form, placeholder_text="Ciudad")
+        self.entry_ubicacion_ciudad.pack(fill="x", padx=10, pady=6)
+        self.entry_ubicacion_direccion = ctk.CTkEntry(form, placeholder_text="Dirección exacta")
+        self.entry_ubicacion_direccion.pack(fill="x", padx=10, pady=6)
+        self.entry_ubicacion_capacidad = ctk.CTkEntry(form, placeholder_text="Capacidad (número de personas)")
+        self.entry_ubicacion_capacidad.pack(fill="x", padx=10, pady=6)
+
+
+        ctk.CTkButton(form, text="➕ Registrar ubicación", command=self.agregar_ubicacion).pack(fill="x", padx=10, pady=(12, 5))
+        ctk.CTkButton(form, text="💾 Actualizar seleccionada", command=self.actualizar_ubicacion).pack(fill="x", padx=10, pady=5)
+        ctk.CTkButton(form, text="🧽 Nueva / Limpiar", command=self.limpiar_form_ubicacion, fg_color="gray").pack(fill="x", padx=10, pady=5)
+        ctk.CTkButton(form, text="🗑️ Eliminar seleccionada", command=self.eliminar_ubicacion, fg_color="#b33939", hover_color="#8f2d2d").pack(fill="x", padx=10, pady=5)
+
+
+
+
 
 
 
