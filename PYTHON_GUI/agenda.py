@@ -666,7 +666,13 @@ class AppAgenda(ctk.CTk):
 
 
     def limpiar_form_ubi(self):
-        
+        self.tree_gestion_ubicaciones.selection_remove(self.tree_ubicaciones.selection())
+        self.entry_ubicaciones_nombre.delete(0, tk.END)
+        self.entry_ubicaciones_ciudad.delete(0, tk.END)
+        self.entry_ubicaciones_direccion.delete(0, tk.END)
+        self.entry_ubicaciones_capacidad.delete(0, tk.END)
+
+
 
 
 
