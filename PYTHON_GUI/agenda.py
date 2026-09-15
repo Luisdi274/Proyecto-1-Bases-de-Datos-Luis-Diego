@@ -145,6 +145,7 @@ class AppAgenda(ctk.CTk):
             ("Ubicaciones", "📍"),      # <-- NUEVO
             ("Recurrentes", "🔁"),      # <-- NUEVO
             ("Tareas", "✅"),           # <-- NUEVO (módulo 3)
+            ("Reportes", "📊"),         # <-- NUEVO: RF-10 y RF-16/17
         ], start=2):
             btn = ctk.CTkButton(
                 self.sidebar_frame, text=f"{icono}  {nombre}",
@@ -158,10 +159,10 @@ class AppAgenda(ctk.CTk):
             self.sidebar_frame,
             text="🔄  Recargar datos",
             command=self.actualizar_todas_las_tablas
-        ).grid(row=8, column=0, padx=15, pady=(20, 5), sticky="ew")  # <-- CAMBIO: row 7 -> 8 (ahora hay 3 botones nuevos, no 2)
+        ).grid(row=9, column=0, padx=15, pady=(20, 5), sticky="ew")  # <-- CAMBIO: row 8 -> 9 (ahora hay 4 pestañas nuevas, no 3)
  
         ctk.CTkLabel(self.sidebar_frame, text="APARIENCIA", font=ctk.CTkFont(size=11, weight="bold")).grid(
-            row=14, column=0, padx=20, pady=(10, 5), sticky="w"  # <-- CAMBIO: row 13 -> 14
+            row=15, column=0, padx=20, pady=(10, 5), sticky="w"  # <-- CAMBIO: row 14 -> 15
         )
         self.option_mode = ctk.CTkOptionMenu(
             self.sidebar_frame,
@@ -169,7 +170,7 @@ class AppAgenda(ctk.CTk):
             command=ctk.set_appearance_mode
         )
         self.option_mode.set("System")
-        self.option_mode.grid(row=15, column=0, padx=15, pady=(0, 25), sticky="ew")  # <-- CAMBIO: row 14 -> 15
+        self.option_mode.grid(row=16, column=0, padx=15, pady=(0, 25), sticky="ew")  # <-- CAMBIO: row 15 -> 16
  
     def crear_area_principal(self):
         self.main_container = ctk.CTkFrame(self, fg_color="transparent")
@@ -186,6 +187,7 @@ class AppAgenda(ctk.CTk):
         self.tab_ubicaciones = self.tabview.add("Ubicaciones")   # <-- NUEVO
         self.tab_recurrentes = self.tabview.add("Recurrentes")   # <-- NUEVO
         self.tab_tareas = self.tabview.add("Tareas")             # <-- NUEVO (módulo 3)
+        self.tab_reportes = self.tabview.add("Reportes")         # <-- NUEVO: RF-10 y RF-16/17
  
         self.configurar_pestana_usuarios()
         self.configurar_pestana_categorias()
@@ -193,6 +195,7 @@ class AppAgenda(ctk.CTk):
         self.configurar_pestana_ubicaciones()   # <-- NUEVO
         self.configurar_pestana_recurrentes()   # <-- NUEVO
         self.configurar_pestana_tareas()        # <-- NUEVO (módulo 3)
+        self.configurar_pestana_reportes()      # <-- NUEVO
         self.seleccionar_modulo("Usuarios")
  
     def al_cambiar_pestana(self):
@@ -1288,6 +1291,99 @@ class AppAgenda(ctk.CTk):
         except Exception as e:
             print(f"Error cargando tareas: {e}")
  
+    # -------------------- REPORTES (RF-10, RF-16, RF-17) -------------------- <-- NUEVO MÓDULO COMPLETO
+    # Panel de solo lectura: no tiene formulario ni botones de crear/editar/eliminar,
+    # solo muestra lo que ya calculan las vistas SQL. Por eso no necesita "combo_x" ni "datos_x_formulario".
+ 
+    def configurar_pestana_reportes(self):
+        self.crear_encabezado(self.tab_reportes, "Reportes",
+                               "Paneles de solo lectura conectados a las vistas de la base de datos (RF-10, RF-16, RF-17).")
+ 
+        contenedor = ctk.CTkScrollableFrame(self.tab_reportes, fg_color="transparent")
+        contenedor.pack(fill="both", expand=True, padx=10, pady=5)
+ 
+        ctk.CTkButton(contenedor, text="🔄 Actualizar reportes",
+                      command=self.cargar_datos_reportes).pack(anchor="e", padx=5, pady=(0, 15))
+ 
+        # --- Reporte 1: ocupación de ubicaciones (RF-10) ---
+        ctk.CTkLabel(contenedor, text="Ocupación de ubicaciones (RF-10)",
+                     font=ctk.CTkFont(size=15, weight="bold")).pack(anchor="w", padx=5, pady=(5, 2))
+        marco_ubi = ctk.CTkFrame(contenedor)
+        marco_ubi.pack(fill="x", padx=5, pady=(0, 20))
+        self.tree_reporte_ubicaciones = self.crear_treeview(
+            marco_ubi, ("Ubicación", "Ciudad", "Cant. eventos", "Minutos reservados"),
+            (200, 140, 130, 170)
+        )
+        self.tree_reporte_ubicaciones.configure(height=6)
+ 
+        # --- Reporte 2: carga de trabajo por usuario (RF-16) ---
+        ctk.CTkLabel(contenedor, text="Carga de trabajo por usuario (RF-16)",
+                     font=ctk.CTkFont(size=15, weight="bold")).pack(anchor="w", padx=5, pady=(5, 2))
+        marco_usu = ctk.CTkFrame(contenedor)
+        marco_usu.pack(fill="x", padx=5, pady=(0, 20))
+        self.tree_reporte_usuarios = self.crear_treeview(
+            marco_usu, ("Usuario", "Tareas activas", "Tareas vencidas"),
+            (250, 150, 150)
+        )
+        self.tree_reporte_usuarios.configure(height=6)
+ 
+        # --- Reporte 3: eventos que arrastran tareas vencidas (RF-16 / RF-17) ---
+        ctk.CTkLabel(contenedor, text="Eventos con tareas vencidas (RF-16 / RF-17)",
+                     font=ctk.CTkFont(size=15, weight="bold")).pack(anchor="w", padx=5, pady=(5, 2))
+        marco_ev = ctk.CTkFrame(contenedor)
+        marco_ev.pack(fill="x", padx=5, pady=(0, 15))
+        self.tree_reporte_eventos_vencidos = self.crear_treeview(
+            marco_ev, ("Evento", "Inicio", "Fin"),
+            (260, 160, 160)
+        )
+        self.tree_reporte_eventos_vencidos.configure(height=6)
+ 
+    def cargar_datos_reportes(self):
+        # Reporte 1: usa la vista vista_para_ocupacion_ubicacion
+        try:
+            filas = self.ejecutar_consulta(
+                "SELECT nombre, ciudad, numero_eventos, minutos_reservados_totales "
+                "FROM vista_para_ocupacion_ubicacion",
+                fetch=True
+            )
+            for item in self.tree_reporte_ubicaciones.get_children():
+                self.tree_reporte_ubicaciones.delete(item)
+            for row in filas:
+                minutos = round(row[3]) if row[3] is not None else 0
+                self.tree_reporte_ubicaciones.insert("", "end", values=(row[0], row[1], row[2], minutos))
+        except Exception as e:
+            print(f"Error cargando reporte de ubicaciones: {e}")
+ 
+        # Reporte 2: usa la vista usuarios_y_sus_respevctivas_tareas
+        try:
+            filas = self.ejecutar_consulta(
+                "SELECT nombre, apellido, tareas_actuales, tareas_vencidas "
+                "FROM usuarios_y_sus_respevctivas_tareas",
+                fetch=True
+            )
+            for item in self.tree_reporte_usuarios.get_children():
+                self.tree_reporte_usuarios.delete(item)
+            for row in filas:
+                nombre_completo = f"{row[0]} {row[1]}"
+                self.tree_reporte_usuarios.insert("", "end", values=(nombre_completo, row[2], row[3]))
+        except Exception as e:
+            print(f"Error cargando reporte de carga de trabajo: {e}")
+ 
+        # Reporte 3: usa la vista vista_tareas_vencidas_en_evento
+        try:
+            filas = self.ejecutar_consulta(
+                "SELECT titulo, fecha_inicio, fecha_fin FROM vista_tareas_vencidas_en_evento",
+                fetch=True
+            )
+            for item in self.tree_reporte_eventos_vencidos.get_children():
+                self.tree_reporte_eventos_vencidos.delete(item)
+            for row in filas:
+                inicio = row[1].strftime("%Y-%m-%d %H:%M") if hasattr(row[1], "strftime") else row[1]
+                fin = row[2].strftime("%Y-%m-%d %H:%M") if hasattr(row[2], "strftime") else row[2]
+                self.tree_reporte_eventos_vencidos.insert("", "end", values=(row[0], inicio, fin))
+        except Exception as e:
+            print(f"Error cargando reporte de eventos vencidos: {e}")
+ 
     # -------------------- REFRESCO GENERAL --------------------
  
     def actualizar_todas_las_tablas(self):
@@ -1297,6 +1393,7 @@ class AppAgenda(ctk.CTk):
         self.cargar_datos_eventos()       # <-- debe ir ANTES de cargar_datos_tareas (construye eventos_combo)
         self.cargar_datos_series()
         self.cargar_datos_tareas()        # <-- NUEVO (módulo 3)
+        self.cargar_datos_reportes()      # <-- NUEVO (RF-10, RF-16, RF-17)
  
  
 if __name__ == "__main__":
