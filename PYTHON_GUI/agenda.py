@@ -729,6 +729,168 @@ class AppAgenda(ctk.CTk):
         except Exception as e:
             messagebox.showerror("No se pudo eliminar", str(e))
 
+
+    def cargar_datos_ubicaciones(self):
+        try:
+            rows = self.ejecutar_consulta(
+                "SELECT id_ubicacion, nombre, ciudad, direccion, capacidad FROM ubicaciones ORDER BY nombre",
+                fetch=True
+            )
+            for item in self.tree_ubicaciones.get_children():
+                self.tree_ubicaciones.delete(item)
+            self.ubicaciones_combo = {}
+            for row in rows:
+                self.tree_ubicaciones.insert("", "end", values=row)
+                etiqueta = f"{row[1]} — #{row[0]}"
+                self.ubicaciones_combo[etiqueta] = row[0]
+        except Exception as e:
+            print(f"Error cargando ubicaciones: {e}")
+
+
+
+    #-----------------------EVENTOS RECURRENTES ---------------------------------------
+
+    def calcular_fechas_serie(self, clase_periodicidad, fecha_inicio, fecha_fin, intervalo_dias, dias_texto):
+        """Devuelve la lista de fechas (una por ocurrencia) según el patrón de la serie."""
+        fechas = []
+        actual = fecha_inicio
+ 
+        if clase_periodicidad == "diario":
+            while actual <= fecha_fin:
+                fechas.append(actual)
+                actual += timedelta(days=1)
+ 
+        elif clase_periodicidad == "personalizado":
+            paso = intervalo_dias or 1
+            while actual <= fecha_fin:
+                fechas.append(actual)
+                actual += timedelta(days=paso)
+ 
+        elif clase_periodicidad == "mensual":
+            while actual <= fecha_fin:
+                fechas.append(actual)
+                mes = actual.month + 1
+                anio = actual.year + (1 if mes > 12 else 0)
+                mes = 1 if mes > 12 else mes
+                try:
+                    actual = actual.replace(year=anio, month=mes)
+                except ValueError:
+                    actual = actual.replace(year=anio, month=mes, day=28)
+ 
+        elif clase_periodicidad == "semanal":
+            nombres = [d.strip().lower() for d in (dias_texto or "").split(",") if d.strip()]
+            numeros_dia = {self.DIAS_SEMANA[n] for n in nombres if n in self.DIAS_SEMANA}
+            if not numeros_dia:
+                raise ValueError("Indica al menos un día válido, ej: martes,jueves")
+            cursor = fecha_inicio
+            while cursor <= fecha_fin:
+                if cursor.weekday() in numeros_dia:
+                    fechas.append(cursor)
+                cursor += timedelta(days=1)
+ 
+        return fechas
+
+
+    def configurar_ventana_evento_recurrentes(self):
+        self.crear_encabezado(self.tab_eventos_Recurrentes,"Eventos recurrentes", "Crea series de eventos con sus detalles que se repiten y se automatizan")
+        cuerpo= ctk.CTkFrame(self.tab_eventos_Recurrentes,fg_color="transparent" )
+        cuerpo.pack(fill="both",expand=True,padx=10,pady=5)
+        cuerpo.grid_columnconfigure(0,weight=3)
+        cuerpo.grid_columnconfigure(1,weight=1)
+        cuerpo.grid_rowconfigure(0,weight=1)
+
+        tabla = ctk.CTkFrame(cuerpo)
+        tabla.grid(row=0,column=0,sticky="nsew",padx=(0,8))
+        form=ctk.CTkScrollableFrame(cuerpo,width=345)
+        form.grid(row=0,column=1,sticky="nsew")
+
+        self.tree_series=self.crear_treeview(tabla,("ID", "Propietario", "Titulo", "Periodicidad", "Inicio", "Fin"),(50,150,180,110,100,100))
+        self.tree_series.bind("<<TreeviewSelect>>",self.cargar_serie_seleccionada)
+
+        ctk.CTkLabel(form,text="Formulario de serie", font=ctk.CTkFont(size=17,weight="bold")).pack(pady=(10,12))
+
+
+        self.entry_serie_titulo = ctk.CTkEntry(form, placeholder_text="Título de la serie")
+        self.entry_serie_titulo.pack(fill="x", padx=10, pady=6)
+ 
+        ctk.CTkLabel(form, text="Propietario").pack(anchor="w", padx=10, pady=(6, 2))
+        self.combo_serie_usuario = ctk.CTkComboBox(form, values=["Seleccione un usuario"], state="readonly")
+        self.combo_serie_usuario.set("Seleccione un usuario")
+        self.combo_serie_usuario.pack(fill="x", padx=10, pady=4)
+ 
+        ctk.CTkLabel(form, text="Inicio de la serie").pack(anchor="w", padx=10, pady=(8, 2))
+        self.fecha_serie_inicio = self.crear_selector_fecha(form)
+        self.fecha_serie_inicio.pack(fill="x", padx=10, pady=4)
+ 
+        ctk.CTkLabel(form, text="Fin de la serie").pack(anchor="w", padx=10, pady=(8, 2))
+        self.fecha_serie_fin = self.crear_selector_fecha(form)
+        self.fecha_serie_fin.pack(fill="x", padx=10, pady=4)
+ 
+        ctk.CTkLabel(form, text="Periodicidad").pack(anchor="w", padx=10, pady=(8, 2))
+        self.combo_serie_periodicidad = ctk.CTkComboBox(
+            form, values=["diario", "semanal", "mensual", "personalizado"],
+            state="readonly", command=self.al_cambiar_periodicidad
+        )
+        self.combo_serie_periodicidad.set("diario")
+        self.combo_serie_periodicidad.pack(fill="x", padx=10, pady=4)
+ 
+        self.entry_serie_intervalo = ctk.CTkEntry(form, placeholder_text="Cada cuántos días (solo si es personalizado)")
+        self.entry_serie_dias = ctk.CTkEntry(form, placeholder_text="Días, ej: martes,jueves (solo si es semanal)")
+ 
+        ctk.CTkButton(form, text="➕ Crear serie", command=self.agregar_serie).pack(fill="x", padx=10, pady=(14, 5))
+        ctk.CTkButton(form, text="💾 Actualizar seleccionada", command=self.actualizar_serie).pack(fill="x", padx=10, pady=5)
+        ctk.CTkButton(form, text="🧹 Nueva / Limpiar", command=self.limpiar_form_serie, fg_color="gray").pack(fill="x", padx=10, pady=5)
+        ctk.CTkButton(form, text="🗑️ Eliminar seleccionada", command=self.eliminar_serie, fg_color="#b33939", hover_color="#8f2d2d").pack(fill="x", padx=10, pady=5)
+ 
+        ctk.CTkLabel(form, text="Generar ocurrencias", font=ctk.CTkFont(size=14, weight="bold")).pack(pady=(20, 8))
+ 
+        ctk.CTkLabel(form, text="Categoría de los eventos generados").pack(anchor="w", padx=10, pady=(2, 2))
+        self.combo_gen_categoria = ctk.CTkComboBox(form, values=["Seleccione una categoría"], state="readonly")
+        self.combo_gen_categoria.set("Seleccione una categoría")
+        self.combo_gen_categoria.pack(fill="x", padx=10, pady=4)
+ 
+        ctk.CTkLabel(form, text="Ubicación (opcional)").pack(anchor="w", padx=10, pady=(6, 2))
+        self.combo_gen_ubicacion = ctk.CTkComboBox(form, values=["Sin ubicación"], state="readonly")
+        self.combo_gen_ubicacion.set("Sin ubicación")
+        self.combo_gen_ubicacion.pack(fill="x", padx=10, pady=4)
+ 
+        fila_horas = ctk.CTkFrame(form, fg_color="transparent")
+        fila_horas.pack(fill="x", padx=10, pady=(6, 4))
+        self.entry_gen_hora_inicio = ctk.CTkEntry(fila_horas, placeholder_text="Hora inicio HH:MM")
+        self.entry_gen_hora_inicio.pack(side="left", fill="x", expand=True, padx=(0, 4))
+        self.entry_gen_hora_fin = ctk.CTkEntry(fila_horas, placeholder_text="Hora fin HH:MM")
+        self.entry_gen_hora_fin.pack(side="left", fill="x", expand=True)
+ 
+        ctk.CTkButton(form, text="⚙️ Generar ocurrencias de esta serie", command=self.generar_ocurrencias).pack(fill="x", padx=10, pady=(10, 15))
+ 
+        self.al_cambiar_periodicidad("diario")
+
+
+
+    def ajuste_cambio_periodicidad(self, valor_periodicidad):
+        self.entry_serie_intervalo.pack_forget()
+        self.entry_serie_dias.pack_forget()
+        if valor_periodicidad=="personalizado":
+            self.entry_serie_intervalo.pack(fill="x",padx=10,pady=4)
+        elif valor_periodicidad=="semanal":
+            self.entry_serie_dias.pack(fill="x",padx=10,pady=4)
+
+
+    def serie_seleccionada_id(self):
+        sel=self.tree_series.selection()
+        if not sel:
+            return
+        valores=self.tree_series.item(sel[0])["values"]
+        self.entry_serie_titulo.delete(0,tk.END); self.entry_serie_titulo.insert(0,valores[2])
+        self.combo_serie_usuario.set(valores[1])
+        self.combo_serie_periodicidad.set(valores[3])
+        self.ajuste_cambio_periodicidad(valores[3])
+        try:
+            self.establecer_fecha(self.fecha_serie_inicio,valores[4])
+            self.establecer_fecha(self.fecha_serie_fin,valores[5])
+
+
+
  
 
             
