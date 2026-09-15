@@ -699,6 +699,38 @@ class AppAgenda(ctk.CTk):
             messagebox.showinfo("UBICACIÓN REGISTRADA CON ÉXITO!")
         except Exception as error:
             messagebox.showerror("No se ha podido registrar la ubicacion", str(error))
+
+    def actualizacion_de_ubicacion(self):
+        uid=self.ubi_seleccionada_id
+        if uid is None:
+            return messagebox.showwarning("Se necesita que seleccione una ubicación.")
+        try:
+            nombre, ciudad, direccion, capacidad = self.datos_ubicacion_formulario()
+            self.ejecutar_consulta(
+                "UPDATE ubicaciones SET nombre=%s, ciudad=%s, direccion=%s, capacidad=%s WHERE id_ubicacion=%s",
+                (nombre, ciudad, direccion, capacidad, uid)
+            )
+            self.cargar_datos_ubicaciones()
+            messagebox.showinfo("Éxito", "Ubicación actualizada.")
+        except Exception as error:
+            messagebox.showerror("No se pudo actualizar", str(error))
+
+
+    def eliminar_una_ubicacion(self):
+        uid=self.ubi_seleccionada_id()
+        if uid is None:
+            return messagebox.showwarning("Debe seleccionar una ubicación.")
+        if not messagebox.askyesno("Confirmar", "¿Eliminar ubicación seleccionada?"):
+            return
+        try:
+            self.ejecutar_consulta("DELETE FROM ubicaciones WHERE id_ubicacion=%s", (uid,))
+            self.limpiar_form_ubicacion(); self.cargar_datos_ubicaciones()
+            messagebox.showinfo("Eliminado", "Ubicación eliminada.")
+        except Exception as e:
+            messagebox.showerror("No se pudo eliminar", str(e))
+
+ 
+
             
 
  
