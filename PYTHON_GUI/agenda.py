@@ -651,7 +651,12 @@ class AppAgenda(ctk.CTk):
         ctk.CTkButton(form, text="🗑️ Eliminar seleccionada", command=self.eliminar_ubicacion, fg_color="#b33939", hover_color="#8f2d2d").pack(fill="x", padx=10, pady=5)
 
 
+    def ubi_seleccionada_id(self):
+        sel=self.tree_gestion_ubicaciones.selection()
+        return self.tree_gestion_ubicaciones.item(sel[0])["values"][0]if sel else None
 
+    def cargar_ubicacion_seleccionada(self,_=None):
+        
 
 
 
