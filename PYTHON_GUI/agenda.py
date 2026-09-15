@@ -888,6 +888,22 @@ class AppAgenda(ctk.CTk):
         try:
             self.establecer_fecha(self.fecha_serie_inicio,valores[4])
             self.establecer_fecha(self.fecha_serie_fin,valores[5])
+        except Exception:
+            pass
+
+
+    def limpiar_formulario_serie(self):
+        self.tree_series.selection_remove(self.tree_series.selection())
+        self.entry_serie_titulo.delete(0, tk.END)
+        self.combo_serie_usuario.set("Seleccione un usuario")
+        self.combo_serie_periodicidad.set("diario")
+        self.entry_serie_intervalo.delete(0, tk.END)
+        self.entry_serie_dias.delete(0, tk.END)
+        self.al_cambiar_periodicidad("diario")
+        hoy = datetime.now()
+        self.establecer_fecha(self.fecha_serie_inicio, hoy)
+        self.establecer_fecha(self.fecha_serie_fin, hoy)
+
 
 
 
