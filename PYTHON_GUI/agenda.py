@@ -660,17 +660,17 @@ class AppAgenda(ctk.CTk):
         if not sel:return
         vals= self.tree_gestion_ubicaciones.item(sel[0])["values"]
         self.entry_ubicacion_nombre.delete()
-        self.entry_ubicacion_ciudad.delete(0, tk.END); self.entry_ub_ciudad.insert(0, vals[2])
+        self.entry_ubicacion_ciudad.delete(0, tk.END); self.entry_ubic_ciudad.insert(0, vals[2])
         self.entry_ubicacion_direccion.delete(0, tk.END); self.entry_ub_direccion.insert(0, vals[3])
         self.entry_ubicacion_capacidad.delete(0, tk.END); self.entry_ub_capacidad.insert(0, vals[4])
 
 
     def limpiar_form_ubi(self):
         self.tree_gestion_ubicaciones.selection_remove(self.tree_ubicaciones.selection())
-        self.entry_ubicaciones_nombre.delete(0, tk.END)
-        self.entry_ubicaciones_ciudad.delete(0, tk.END)
-        self.entry_ubicaciones_direccion.delete(0, tk.END)
-        self.entry_ubicaciones_capacidad.delete(0, tk.END)
+        self.entry_ubicacion_nombre.delete(0, tk.END)
+        self.entry_ubicacion_ciudad.delete(0, tk.END)
+        self.entry_ubicacion_direccion.delete(0, tk.END)
+        self.entry_ubicacion_capacidad.delete(0, tk.END)
 
 
 
