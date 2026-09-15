@@ -674,10 +674,10 @@ class AppAgenda(ctk.CTk):
 
 
     def datos_ubicacion_formulario(self):
-        nombre = self.entry_ub_nombre.get().strip()
-        ciudad = self.entry_ub_ciudad.get().strip()
-        direccion = self.entry_ub_direccion.get().strip()
-        capacidad_texto = self.entry_ub_capacidad.get().strip()
+        nombre = self.entry_ubicacion_nombre.get().strip()
+        ciudad = self.entry_ubicacion_ciudad.get().strip()
+        direccion = self.entry_ubicacion_direccion.get().strip()
+        capacidad_texto = self.entry_ubicacion_capacidad.get().strip()
         if not nombre or not ciudad or not direccion or not capacidad_texto:
             raise ValueError("Completa todos los campos de la ubicación especifica.")
         try:
@@ -687,6 +687,20 @@ class AppAgenda(ctk.CTk):
         if capacidad <= 0:
             raise ValueError("La capacidad debe ser >0.")
         return nombre, ciudad, direccion, capacidad
+
+
+
+    def almacenar_ubicacion(self):
+        try:
+            datos=self.datos_ubicacion_formulario()
+            self.ejecutar_consulta("INSERT INTO ubicaciones (nombre, ciudad, direccion, capacidad) VALUES (%s, %s, %s, %s)",datos)
+
+            self.limpiar_form_ubi(); self.cargar_datos_ubi()
+            messagebox.showinfo("UBICACIÓN REGISTRADA CON ÉXITO!")
+        except Exception as error:
+            messagebox.showerror("No se ha podido registrar la ubicacion", str(error))
+            
+
  
 
 
