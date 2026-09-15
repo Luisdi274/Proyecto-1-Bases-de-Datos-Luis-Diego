@@ -616,6 +616,16 @@ class AppAgenda(ctk.CTk):
         except Exception as e:
             print(f"Error cargando eventos: {e}")
 
+
+    #----------UBICACIONES-------------- 
+    def configurar_ventana_gestion_ubis(self):
+        self.tabla_encabezados(self.tab_ubicaciones,"Ubicaciones","Administración de salas","Auditorios y lugares físicos con disponibilidad")
+        cuerpo= ctk.CTkFrame(self.tab_gestUbicaciones,fg_color="transparent")
+        cuerpo.pack(fill="both",expand=True,padx=10,pady=5)
+        cuerpo.grid_columnconfigure(0,weight=3)
+        cuerpo.grid_columnconfigure(1,weight=1)
+        cuerpo.grid_rowconfigure(0,weight=1)
+
     # -------------------- REFRESCO GENERAL --------------------
 
     def actualizar_todas_las_tablas(self):
