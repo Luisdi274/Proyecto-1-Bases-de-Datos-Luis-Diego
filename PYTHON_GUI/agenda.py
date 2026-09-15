@@ -626,6 +626,21 @@ class AppAgenda(ctk.CTk):
         cuerpo.grid_columnconfigure(1,weight=1)
         cuerpo.grid_rowconfigure(0,weight=1)
 
+        tabla=ctk.CTkFrame(cuerpo)
+        tabla.grid(row=0,column=0,sticky="nsew",padx=(0,8))
+        form=ctk.CTkScrollableFrame(cuerpo,width=320);form.grid(row=0,column=1,sticky="nsew")
+
+        self.tree_gestion_ubicaciones=self.crear_treeview(tabla,("ID","Nombre", "Ciudad", "Direccion","Capacidad"),(60,160,130,220,90))
+        self.tree_gestion_ubicaciones.bind("<<TreeviewSelect>>",self.cargar_ubicacion_seleccionada)
+
+
+        ctk.CTkLabel(form,text="Formulario de gestión de ubicaciones",font=ctk.CTkFont(size=16,weight="bold")).pack(pady=(10,15))
+
+
+
+
+
+
     # -------------------- REFRESCO GENERAL --------------------
 
     def actualizar_todas_las_tablas(self):
