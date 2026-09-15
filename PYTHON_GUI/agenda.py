@@ -673,6 +673,22 @@ class AppAgenda(ctk.CTk):
         self.entry_ubicacion_capacidad.delete(0, tk.END)
 
 
+    def datos_ubicacion_formulario(self):
+        nombre = self.entry_ub_nombre.get().strip()
+        ciudad = self.entry_ub_ciudad.get().strip()
+        direccion = self.entry_ub_direccion.get().strip()
+        capacidad_texto = self.entry_ub_capacidad.get().strip()
+        if not nombre or not ciudad or not direccion or not capacidad_texto:
+            raise ValueError("Completa todos los campos de la ubicación especifica.")
+        try:
+            capacidad = int(capacidad_texto)
+        except ValueError:
+            raise ValueError("La capacidad debe ser un número entero.")
+        if capacidad <= 0:
+            raise ValueError("La capacidad debe ser >0.")
+        return nombre, ciudad, direccion, capacidad
+ 
+
 
 
 
