@@ -1,0 +1,2 @@
+Este repositorio explica un poco la extensión de una base de datos relacionada con una agenda, el proceso es primero con modelos de diagramas que permiten identificar los elementos en el diseño de la BD. Además, luego convertimos esa información en tablas
+para hablar en términos relacionales. Y por último modelo fisico en el lenguaje SQL donde se deben usar restricciones para que haya consistencia en datos, etc.
