@@ -275,7 +275,7 @@ declare
 	usuario_activo BOOLEAN;
 	--en este trigger vamos a declarar una variable booleana para confirmar que usuario está activo
 begin
-		select activo into usuario_activo from usuarios where id_usuario = new.id_usuario_propietario
+		select activo into usuario_activo from usuarios where id_usuario = new.id_usuario_propietario;
 		--esto se pone porque un usuario que sea propietario de un evento solo puede tener estado activo
 		if usuario_activo is false then 
 			raise exception 'no se puede crear o cambiar un evento si el usuario no está activo';
@@ -295,7 +295,7 @@ begin
 	if new.id_ubicacion is not null then
 		select exists (
 			select * from eventos pEvento where pEvento.id_ubicacion= new.id_ubicacion
-			and pEvento.id_evento <> coalesce(new.id_evento,-3) and (pEvento.fecha_inicio,pEvento.fecha_fin) overlaps (new.fecha_inicio,new.fecha_fin)) into hay_traslape
+			and pEvento.id_evento <> coalesce(new.id_evento,-3) and (pEvento.fecha_inicio,pEvento.fecha_fin) overlaps (new.fecha_inicio,new.fecha_fin)) into hay_traslape;
 			--se pone coalesce, pues por un trigger ya existente, el id_evento es nulo en un insert, por lo que siempre devolverá el -1
 		if hay_traslape then
 		--coalesce devuelve el primer valor no nulo de una lista
@@ -338,9 +338,9 @@ values (1,'Clase de yoga','2026-09-17','2026-12-17','semanal',null,'martes,jueve
 --prueba usando un caso válido de los constraints check
 
 
-insert into series_eventos (id_usuario_propietario,titulo_serie,fecha_inicio,fecha_fin,clase_periodicidad,intervalo_en_dias_eventos,reserva_dias_especificos)
+/*insert into series_eventos (id_usuario_propietario,titulo_serie,fecha_inicio,fecha_fin,clase_periodicidad,intervalo_en_dias_eventos,reserva_dias_especificos)
 values (1,'Clase de yoga','2026-09-17','2026-12-17','semanal',null,null);
---este es el caso inválido para comprobar que el check funciona bien
+--este es el caso inválido para comprobar que el check funciona bien */
 
 
 
