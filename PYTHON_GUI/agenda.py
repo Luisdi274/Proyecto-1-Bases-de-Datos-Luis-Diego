@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
-from datetime import datetime, timedelta  # <-- CAMBIO: se agregó timedelta (se usa para sumar días a una fecha)
+from datetime import datetime, timedelta  
  
 import customtkinter as ctk
 import psycopg2
@@ -17,9 +17,7 @@ ctk.set_default_color_theme("blue")
  
 class AppAgenda(ctk.CTk):
  
-    # <-- NUEVO: diccionario de apoyo para el módulo de Eventos Recurrentes.
-    # Traduce el nombre de un día de la semana (en español) al número que usa Python
-    # (Python cuenta: lunes=0, martes=1, miercoles=2 ... domingo=6)
+    
     DIAS_SEMANA = {
         "lunes": 0, "martes": 1, "miercoles": 2, "miércoles": 2,
         "jueves": 3, "viernes": 4, "sabado": 5, "sábado": 5, "domingo": 6,
@@ -36,13 +34,13 @@ class AppAgenda(ctk.CTk):
             "user": "postgres",
             "password": "postgres",
             "host": "localhost",
-            "port": "5432",  # <-- recuerda: ya lo tenías corregido a 5432
+            "port": "5432",  
         }
  
         self.usuarios_combo = {}
         self.categorias_combo = {}
         self.categorias_padre_combo = {}
-        self.ubicaciones_combo = {}  # <-- NUEVO: diccionario "nombre de ubicación -> id_ubicacion"
+        self.ubicaciones_combo = {}  
  
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
@@ -136,16 +134,15 @@ class AppAgenda(ctk.CTk):
         ).grid(row=1, column=0, padx=20, pady=(0, 25), sticky="w")
  
         self.botones_nav = {}
-        # <-- CAMBIO: se agregaron dos tuplas nuevas a esta lista: Ubicaciones y Recurrentes.
-        # Como el ciclo "for" ya recorre esta lista automáticamente, no hay que tocar nada más aquí.
+    
         for i, (nombre, icono) in enumerate([
             ("Usuarios", "👥"),
             ("Categorías", "📁"),
             ("Eventos", "🗓️"),
-            ("Ubicaciones", "📍"),      # <-- NUEVO
-            ("Recurrentes", "🔁"),      # <-- NUEVO
-            ("Tareas", "✅"),           # <-- NUEVO (módulo 3)
-            ("Reportes", "📊"),         # <-- NUEVO: RF-10 y RF-16/17
+            ("Ubicaciones", "📍"),      
+            ("Recurrentes", "🔁"),      
+            ("Tareas", "✅"),          
+            ("Reportes", "📊"),         
         ], start=2):
             btn = ctk.CTkButton(
                 self.sidebar_frame, text=f"{icono}  {nombre}",
@@ -159,10 +156,10 @@ class AppAgenda(ctk.CTk):
             self.sidebar_frame,
             text="🔄  Recargar datos",
             command=self.actualizar_todas_las_tablas
-        ).grid(row=9, column=0, padx=15, pady=(20, 5), sticky="ew")  # <-- CAMBIO: row 8 -> 9 (ahora hay 4 pestañas nuevas, no 3)
+        ).grid(row=9, column=0, padx=15, pady=(20, 5), sticky="ew")  
  
         ctk.CTkLabel(self.sidebar_frame, text="APARIENCIA", font=ctk.CTkFont(size=11, weight="bold")).grid(
-            row=15, column=0, padx=20, pady=(10, 5), sticky="w"  # <-- CAMBIO: row 14 -> 15
+            row=15, column=0, padx=20, pady=(10, 5), sticky="w"  
         )
         self.option_mode = ctk.CTkOptionMenu(
             self.sidebar_frame,
@@ -170,7 +167,7 @@ class AppAgenda(ctk.CTk):
             command=ctk.set_appearance_mode
         )
         self.option_mode.set("System")
-        self.option_mode.grid(row=16, column=0, padx=15, pady=(0, 25), sticky="ew")  # <-- CAMBIO: row 15 -> 16
+        self.option_mode.grid(row=16, column=0, padx=15, pady=(0, 25), sticky="ew")  
  
     def crear_area_principal(self):
         self.main_container = ctk.CTkFrame(self, fg_color="transparent")
@@ -184,18 +181,18 @@ class AppAgenda(ctk.CTk):
         self.tab_usuarios = self.tabview.add("Usuarios")
         self.tab_categorias = self.tabview.add("Categorías")
         self.tab_eventos = self.tabview.add("Eventos")
-        self.tab_ubicaciones = self.tabview.add("Ubicaciones")   # <-- NUEVO
-        self.tab_recurrentes = self.tabview.add("Recurrentes")   # <-- NUEVO
-        self.tab_tareas = self.tabview.add("Tareas")             # <-- NUEVO (módulo 3)
-        self.tab_reportes = self.tabview.add("Reportes")         # <-- NUEVO: RF-10 y RF-16/17
+        self.tab_ubicaciones = self.tabview.add("Ubicaciones")   
+        self.tab_recurrentes = self.tabview.add("Recurrentes")   
+        self.tab_tareas = self.tabview.add("Tareas")             
+        self.tab_reportes = self.tabview.add("Reportes")         
  
         self.configurar_pestana_usuarios()
         self.configurar_pestana_categorias()
         self.configurar_pestana_eventos()
-        self.configurar_pestana_ubicaciones()   # <-- NUEVO
-        self.configurar_pestana_recurrentes()   # <-- NUEVO
-        self.configurar_pestana_tareas()        # <-- NUEVO (módulo 3)
-        self.configurar_pestana_reportes()      # <-- NUEVO
+        self.configurar_pestana_ubicaciones()   
+        self.configurar_pestana_recurrentes() 
+        self.configurar_pestana_tareas()        
+        self.configurar_pestana_reportes()      
         self.seleccionar_modulo("Usuarios")
  
     def al_cambiar_pestana(self):
@@ -213,7 +210,7 @@ class AppAgenda(ctk.CTk):
         )
  
     # -------------------- USUARIOS --------------------
-    # (sin cambios respecto al archivo original)
+    
  
     def configurar_pestana_usuarios(self):
         self.crear_encabezado(self.tab_usuarios, "Usuarios", "Registra, consulta y administra los usuarios de la agenda.")
@@ -329,7 +326,7 @@ class AppAgenda(ctk.CTk):
             print(f"Error cargando usuarios: {e}")
  
     # -------------------- CATEGORÍAS --------------------
-    # (sin cambios respecto al archivo original)
+   
  
     def configurar_pestana_categorias(self):
         self.crear_encabezado(self.tab_categorias, "Categorías", "Organiza los eventos mediante categorías y subcategorías.")
@@ -446,9 +443,7 @@ class AppAgenda(ctk.CTk):
             print(f"Error cargando categorías: {e}")
  
     # -------------------- EVENTOS --------------------
-    # (sin cambios respecto al archivo original, salvo el INSERT/UPDATE que ahora
-    #  podrían incluir id_ubicacion / id_serie si tú decides exponerlos aquí también;
-    #  se dejan tal cual para no romper lo que ya funciona)
+    
  
     def configurar_pestana_eventos(self):
         self.crear_encabezado(self.tab_eventos, "Eventos", "Programa eventos seleccionando usuarios, categorías, fechas y horas.")
@@ -655,7 +650,7 @@ class AppAgenda(ctk.CTk):
         except Exception as e:
             print(f"Error cargando eventos: {e}")
  
-    # -------------------- UBICACIONES -------------------- <-- NUEVO MÓDULO COMPLETO
+    # -------------------- UBICACIONES -------------------- 
  
     def configurar_pestana_ubicaciones(self):
         self.crear_encabezado(self.tab_ubicaciones, "Ubicaciones",
@@ -785,7 +780,7 @@ class AppAgenda(ctk.CTk):
         except Exception as e:
             print(f"Error cargando ubicaciones: {e}")
  
-    # -------------------- EVENTOS RECURRENTES (series_eventos) -------------------- <-- NUEVO MÓDULO COMPLETO
+    # -------------------- EVENTOS RECURRENTES (series_eventos) -------------------- 
  
     def calcular_fechas_serie(self, clase_periodicidad, fecha_inicio, fecha_fin,
                                intervalo_dias, dias_texto):
@@ -1109,7 +1104,7 @@ class AppAgenda(ctk.CTk):
         except Exception as e:
             messagebox.showerror("No se pudo generar", str(e))
  
-    # -------------------- TAREAS -------------------- <-- NUEVO MÓDULO COMPLETO (módulo 3)
+    # -------------------- TAREAS -------------------- 
  
     def configurar_pestana_tareas(self):
         self.crear_encabezado(self.tab_tareas, "Tareas",
@@ -1291,9 +1286,8 @@ class AppAgenda(ctk.CTk):
         except Exception as e:
             print(f"Error cargando tareas: {e}")
  
-    # -------------------- REPORTES (RF-10, RF-16, RF-17) -------------------- <-- NUEVO MÓDULO COMPLETO
-    # Panel de solo lectura: no tiene formulario ni botones de crear/editar/eliminar,
-    # solo muestra lo que ya calculan las vistas SQL. Por eso no necesita "combo_x" ni "datos_x_formulario".
+    # -------------------- REPORTES (RF-10, RF-16, RF-17) -------------------- 
+    
  
     def configurar_pestana_reportes(self):
         self.crear_encabezado(self.tab_reportes, "Reportes",
@@ -1327,7 +1321,7 @@ class AppAgenda(ctk.CTk):
         )
         self.tree_reporte_usuarios.configure(height=6)
  
-        # --- Reporte 3: eventos que arrastran tareas vencidas (RF-16 / RF-17) ---
+       
         ctk.CTkLabel(contenedor, text="Eventos con tareas vencidas (RF-16 / RF-17)",
                      font=ctk.CTkFont(size=15, weight="bold")).pack(anchor="w", padx=5, pady=(5, 2))
         marco_ev = ctk.CTkFrame(contenedor)
@@ -1369,7 +1363,7 @@ class AppAgenda(ctk.CTk):
         except Exception as e:
             print(f"Error cargando reporte de carga de trabajo: {e}")
  
-        # Reporte 3: usa la vista vista_tareas_vencidas_en_evento
+        
         try:
             filas = self.ejecutar_consulta(
                 "SELECT titulo, fecha_inicio, fecha_fin FROM vista_tareas_vencidas_en_evento",
@@ -1389,11 +1383,11 @@ class AppAgenda(ctk.CTk):
     def actualizar_todas_las_tablas(self):
         self.cargar_datos_usuarios()
         self.cargar_datos_categorias()
-        self.cargar_datos_ubicaciones()   # <-- debe ir ANTES de cargar_datos_series (la necesita)
-        self.cargar_datos_eventos()       # <-- debe ir ANTES de cargar_datos_tareas (construye eventos_combo)
+        self.cargar_datos_ubicaciones()   
+        self.cargar_datos_eventos()       
         self.cargar_datos_series()
-        self.cargar_datos_tareas()        # <-- NUEVO (módulo 3)
-        self.cargar_datos_reportes()      # <-- NUEVO (RF-10, RF-16, RF-17)
+        self.cargar_datos_tareas()        
+        self.cargar_datos_reportes()      
  
  
 if __name__ == "__main__":
