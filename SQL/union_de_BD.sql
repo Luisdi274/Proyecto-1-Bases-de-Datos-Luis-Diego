@@ -1,5 +1,5 @@
 --creacion de base de datos para proyecto
-CREATE DATABASE agenda;
+CREATE DATABASE agenda WITH ENCODING 'UTF-8';
 
 CREATE SCHEMA prototipo;
 
