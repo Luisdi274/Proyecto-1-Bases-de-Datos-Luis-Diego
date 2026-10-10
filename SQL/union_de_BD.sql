@@ -168,6 +168,51 @@ SELECT
 FROM eventos
 GROUP BY id_usuario_propietario, fecha_inicio::DATE;
 
+
+create view vista_para_ocupacion_ubicacion as
+--una vista de resumen, es como una consulta o un reporte 
+--se genera con los datos que haya en el momento
+select ubi.id_ubicacion, ubi.nombre,ubi.ciudad,
+--esto es para decir las columnas de la tabla que se verán en el reporte. con una "variable" ubi
+count(e.id_evento) as numero_eventos,
+--cuenta cuantos eventos hay
+coalesce(sum(extract(epoch from(e.fecha_fin - e.fecha_inicio))/60),0) as minutos_reservados_totales
+--e.fecha_fin -e.fecha_inicio, resta fechas para ver cuanto duró
+--extract(epoch....), es una funcion para convertir a segundos totales, luego se divide entre 60 para tenerlo en minutos
+--sum(....), suma los minutos de los eventos
+--coalesce(....) devuelve 0 si el resultado de todo lo q esta antes de la coma es nulo
+from ubicaciones ubi
+left join eventos e on e.id_ubicacion=ubi.id_ubicacion
+--esto es para unir 2 tablas
+group by ubi.id_ubicacion, ubi.nombre, ubi.ciudad
+order by numero_eventos desc;
+
+
+create view usuarios_y_sus_respevctivas_tareas as
+select usu.id_usuario,usu.nombre,usu.apellido,
+count(*) filter (where pTarea.estado in('pendiente','en progreso')) as tareas_actuales,
+--aqui va a contar las instancias o tuplas pero solo las que cumplen la condicion del where
+count(*) filter(
+where pTarea.estado not in ('completada', 'cancelada') and pTarea.fecha_limite<current_date
+)as tareas_Vencidas
+--current date es palabra reservada de sql para la fecha actual
+from usuarios as usu
+left join tareas pTarea on pTarea.id_usuario_a_cargo=usu.id_usuario
+--recordar que este join basicamente hace que se presenten las filas o registros de la tabla de ubicaciones, tenga relacion o no con la tabla derecha
+--y si no lo hay, pone null en la segunda tabla
+group by usu.id_usuario,usu.nombre,usu.apellido
+order by tareas_Vencidas desc, tareas_actuales desc;
+--presenta las tareas vencidas, pero de cada usuario, no como tal esas tareas
+
+create view  vista_tareas_vencidas_en_evento as 
+select distinct pEvento.id_evento,pEvento.titulo,pEvento.fecha_inicio,pEvento.fecha_fin
+--el distinct es para que no se repitan resultados iguales, en este caso para un mismo evento
+from eventos pEvento
+join tareas pTarea on pTarea.id_evento = pEvento.id_evento
+--este join es el normal, pues debe haber coincidencia en las tareas vencidas
+where pTarea.estado not in ('cancelada','completada') and pTarea.fecha_limite <current_date
+order by pEvento.fecha_inicio;
+
 --Integridad y Prevención de Ciclos (RE05)
 --Para evitar ciclos en la jerarquía de categorías, podemos usar una función 
 --que verifique el ancestro antes de insertar o actualizar:
@@ -217,13 +262,7 @@ BEGIN
 			RAISE EXCEPTION 'Imposible guardar esta categoria como padre, provocaría ciclo jerarquico';
 		END IF;
 
-			
-		
-		
-		
-
-
-    -- Aquí se podría añadir una consulta recursiva para validar ancestros, 
+	-- Aquí se podría añadir una consulta recursiva para validar ancestros, 
     -- pero para Postgres 14 es altamente eficiente usar el camino (path) o este chequeo simple. 
 	--aun asi se genera la consulta recursiva
     RETURN NEW;
@@ -287,23 +326,7 @@ create trigger trg_no_traslapes_en_eventos
 before insert or update on eventos
 for each row execute  function anti_traslape_eventos();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+--CASOS DE PRUEBA
 
 insert into usuarios(nombre,apellido)
 values ('Ana','Rodriguez');
@@ -321,57 +344,8 @@ values (1,'Clase de yoga','2026-09-17','2026-12-17','semanal',null,null);
 
 
 
-alter table tareas add constraint fijacion_entradas_estado_tareas check(
-estado in('pendiente','en progreso','completada','cancelada')
-);
---igual que en el primer constraint, el modulo de tareas para esta tabla solo permite 4 posibles valores para su columna estado
-
-alter table ubicaciones add constraint dominio_capacidad check(capacidad >0);
---revision de dominio
-
-create view vista_para_ocupacion_ubicacion as
---una vista de resumen, es como una consulta o un reporte 
---se genera con los datos que haya en el momento
-select ubi.id_ubicacion, ubi.nombre,ubi.ciudad,
---esto es para decir las columnas de la tabla que se verán en el reporte. con una "variable" ubi
-count(e.id_evento) as numero_eventos,
---cuenta cuantos eventos hay
-coalesce(sum(extract(epoch from(e.fecha_fin - e.fecha_inicio))/60),0) as minutos_reservados_totales
---e.fecha_fin -e.fecha_inicio, resta fechas para ver cuanto duró
---extract(epoch....), es una funcion para convertir a segundos totales, luego se divide entre 60 para tenerlo en minutos
---sum(....), suma los minutos de los eventos
---coalesce(....) devuelve 0 si el resultado de todo lo q esta antes de la coma es nulo
-from ubicaciones ubi
-left join eventos e on e.id_ubicacion=ubi.id_ubicacion
---esto es para unir 2 tablas
-group by ubi.id_ubicacion, ubi.nombre, ubi.ciudad
-order by numero_eventos desc;
 
 
-create view usuarios_y_sus_respevctivas_tareas as
-select usu.id_usuario,usu.nombre,usu.apellido,
-count(*) filter (where pTarea.estado in('pendiente','en progreso')) as tareas_actuales,
---aqui va a contar las instancias o tuplas pero solo las que cumplen la condicion del where
-count(*) filter(
-where pTarea.estado not in ('completada', 'cancelada') and pTarea.fecha_limite<current_date
-)as tareas_Vencidas
---current date es palabra reservada de sql para la fecha actual
-from usuarios as usu
-left join tareas pTarea on pTarea.id_usuario_a_cargo=usu.id_usuario
---recordar que este join basicamente hace que se presenten las filas o registros de la tabla de ubicaciones, tenga relacion o no con la tabla derecha
---y si no lo hay, pone null en la segunda tabla
-group by usu.id_usuario,usu.nombre,usu.apellido
-order by tareas_Vencidas desc, tareas_actuales desc;
---presenta las tareas vencidas, pero de cada usuario, no como tal esas tareas
-
-create view  vista_tareas_vencidas_en_evento as 
-select distinct pEvento.id_evento,pEvento.titulo,pEvento.fecha_inicio,pEvento.fecha_fin
---el distinct es para que no se repitan resultados iguales, en este caso para un mismo evento
-from eventos pEvento
-join tareas pTarea on pTarea.id_evento = pEvento.id_evento
---este join es el normal, pues debe haber coincidencia en las tareas vencidas
-where pTarea.estado not in ('cancelada','completada') and pTarea.fecha_limite <current_date
-order by pEvento.fecha_inicio;
 
 
 
