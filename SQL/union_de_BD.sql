@@ -117,6 +117,24 @@ CREATE TABLE TAREAS(
 
 
 
+alter table series_eventos  add constraint entradas_clase_periodicidad check(clase_periodicidad  in('diario','semanal','mensual','personalizado'));
+--ya habiamos creado la tabla de series_eventos, ahora se le pone la restricción de que solo permita 4 posibles valores
+--se va a registrar todo en minuscula, hay diferencia entre mayusucla y minuscula
+
+alter table series_eventos add constraint tipo_entrada_intervalo_dias check(
+(clase_periodicidad ='personalizado' and intervalo_en_dias_eventos is not null) or
+(clase_periodicidad <>'personalizado' and intervalo_en_dias_eventos is null)
+);
+--recordemos que el intervalo de dias de una serie de eventos solo se usa si su periodicidad es personalizada
+
+
+alter table series_eventos add constraint valores_para_dias_especificos_serie_evento check (
+(reserva_dias_especificos is null and clase_periodicidad ='personalizado' ) or (reserva_dias_especificos is not null and clase_periodicidad ='semanal') or
+(reserva_dias_especificos is null and clase_periodicidad = 'diario') or (reserva_dias_especificos is null and clase_periodicidad='mensual')
+
+);
+
+
 
 
 
@@ -271,27 +289,10 @@ for each row execute  function anti_traslape_eventos();
 
 
 
-CREATE TABLE TAREAS(
-    id_tarea SERIAL PRIMARY KEY,
-    id_usuario_a_cargo int NOT NULL REFERENCES usuarios(id_usuario) ON DELETE RESTRICT,
-    id_evento int NOT NULL REFERENCES eventos(id_evento) ON DELETE CASCADE,
-    --aqui tendrá sentido agregar un cascade, pues recordemos que si un evento se elimina, entonces invitaciones y lo relacionado con él también
-    descripcion VARCHAR(150),
-    --este valor no puede ser unico, porque al final pueden haber varias ocurrencias con la misma descripcion
-    prioridad VARCHAR(25) NOT NULL,
-    titulo VARCHAR(80) NOT NULL,
-    fecha_limite DATE ,
-    estado VARCHAR(25) NOT NULL 
-    
-);
 
 
 
-ALTER TABLE eventos
-ADD COLUMN id_ubicacion int  REFERENCES UBICACIONES(id_ubicacion),
---un evento no necesariamente tendrá desde el inicio una ubicación definida, por lo que puede ser nullable
-ADD COLUMN id_serie int REFERENCES SERIES_EVENTOS(id_serie);
---lo mismo con esto
+
 
 
 
