@@ -47,6 +47,24 @@ create table UBICACIONES (
 	--poner capacidad not null responde al requerimiento funcional #10 acerca de los reportes
 );
 
+create table SERIES_EVENTOS (
+    id_serie SERIAL primary key,
+    id_usuario_propietario int not null REFERENCES usuarios(id_usuario),
+    --esta es la llave foranea de esta tabla
+    titulo_serie varchar(90) not null,
+    --lo que aparece en pantalla de la aplicacion no puede ser nulo, es un titulo especifico para la serie del evento
+
+    fecha_inicio date not null,
+    fecha_fin date not null,
+    clase_periodicidad varchar(21) not null,
+    --debe ser diaria,semanal, mensual o personalizada, pero nunca nula, luego se le agregará un check
+    intervalo_en_dias_eventos int,
+    --este es el campo que se debe llenar en caso de que sea personalizado, de lo contrario es nulo, pues se sobre entiende
+    --por la clase de periodicidad
+    reserva_dias_especificos varchar(50)
+    --si la periodicidad es semanal, se debe especificar valores,sino es nula
+);
+
 -- 4. Eventos (RF04, RE04)
 CREATE TABLE eventos (
     id_evento SERIAL PRIMARY KEY,
@@ -58,6 +76,13 @@ CREATE TABLE eventos (
     fecha_fin TIMESTAMP NOT NULL,
     CONSTRAINT check_fechas CHECK (fecha_fin > fecha_inicio)
 );
+
+
+ALTER TABLE eventos
+ADD COLUMN id_ubicacion int  REFERENCES UBICACIONES(id_ubicacion),
+--un evento no necesariamente tendrá desde el inicio una ubicación definida, por lo que puede ser nullable
+ADD COLUMN id_serie int REFERENCES SERIES_EVENTOS(id_serie);
+--lo mismo con esto
 
 -- 5. Participación (RF05, RE01, RN01, RN05)
 CREATE TABLE participaciones (
@@ -74,6 +99,30 @@ CREATE TABLE log_accesos (
     id_usuario INT REFERENCES usuarios(id_usuario),
     fecha_acceso TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+CREATE TABLE TAREAS(
+    id_tarea SERIAL PRIMARY KEY,
+    id_usuario_a_cargo int NOT NULL REFERENCES usuarios(id_usuario) ON DELETE RESTRICT,
+    id_evento int NOT NULL REFERENCES eventos(id_evento) ON DELETE CASCADE,
+    --aqui tendrá sentido agregar un cascade, pues recordemos que si un evento se elimina, entonces invitaciones y lo relacionado con él también
+    descripcion VARCHAR(150),
+    --este valor no puede ser unico, porque al final pueden haber varias ocurrencias con la misma descripcion
+    prioridad VARCHAR(25) NOT NULL,
+    titulo VARCHAR(80) NOT NULL,
+    fecha_limite DATE ,
+    estado VARCHAR(25) NOT NULL 
+    
+);
+
+
+
+
+
+
+
+
+
 
 -- Implementación de Cálculos Dinámicos (RF07, RE03, RN03) mediante vistas
 
@@ -219,23 +268,7 @@ for each row execute  function anti_traslape_eventos();
 
 
 
-create table SERIES_EVENTOS (
-    id_serie SERIAL primary key,
-    id_usuario_propietario int not null REFERENCES usuarios(id_usuario),
-    --esta es la llave foranea de esta tabla
-    titulo_serie varchar(90) not null,
-    --lo que aparece en pantalla de la aplicacion no puede ser nulo, es un titulo especifico para la serie del evento
 
-    fecha_inicio date not null,
-    fecha_fin date not null,
-    clase_periodicidad varchar(21) not null,
-    --debe ser diaria,semanal, mensual o personalizada, pero nunca nula, luego se le agregará un check
-    intervalo_en_dias_eventos int,
-    --este es el campo que se debe llenar en caso de que sea personalizado, de lo contrario es nulo, pues se sobre entiende
-    --por la clase de periodicidad
-    reserva_dias_especificos varchar(50)
-    --si la periodicidad es semanal, se debe especificar valores,sino es nula
-);
 
 
 CREATE TABLE TAREAS(
